@@ -1,0 +1,5 @@
+#   VSCode config files
+.vscode
+
+#   QT Creator config files
+*.user
