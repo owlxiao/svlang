@@ -42,14 +42,8 @@ int main(int argc, const char **argv) {
     int n = 0;
     svlang::Token Tok;
     do {
-      ++n;
       PP.Lex(Tok);
-    } while (
-        n !=
-        SrcMgr.getMemoryBuffer(SrcMgr.getMainFileID())->getBufferStart() -
-            SrcMgr.getMemoryBuffer(SrcMgr.getMainFileID())->getBufferEnd());
-
-    llvm::outs() << SrcMgr.getMainFileID() << "\n";
+    } while (Tok.isNot(tok::_EOF));
   }
   return 0;
 }
