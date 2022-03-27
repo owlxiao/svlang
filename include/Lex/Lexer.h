@@ -22,6 +22,10 @@ public:
 
   const char *ConsumeChar(const char *Ptr, unsigned int Size);
 
+  // Helper functions for lex token
+public:
+  void SkipWhiteSpace(Token &Result, const char *CurPtr);
+
 private:
   const char *BufferStart;
   const char *BufferEnd;

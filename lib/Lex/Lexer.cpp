@@ -1,6 +1,8 @@
 
 #include <iostream>
 
+#include <llvm/Support/Compiler.h>
+
 #include "Basic/CharInfo.h"
 #include "Lex/Lexer.h"
 
@@ -12,6 +14,34 @@ Lexer::Lexer(llvm::SourceMgr &SM) {
   BufferPtr = SM.getMemoryBuffer(MainFileID)->getBufferStart();
   BufferEnd = SM.getMemoryBuffer(MainFileID)->getBufferEnd();
 }
+
+//
+// Helper functions
+
+void Lexer::SkipWhiteSpace(Token &Result, const char *CurPtr) {
+  unsigned char Char = *CurPtr;
+
+  while (true) {
+    // Skip Horizontal Whitespace:
+    // ' ', '\t', '\f', 'v'
+    while (clang::isHorizontalWhitespace(Char)) {
+      Char = *++CurPtr;
+    }
+
+    // Otherwise we see:
+    // '\n', '\r'
+    if (!clang::isVerticalWhitespace(Char)) {
+      break;
+    }
+
+    Char = *++CurPtr;
+  }
+
+  BufferPtr = CurPtr;
+}
+
+// End - Helper functions
+//
 
 inline char Lexer::advanceChar(const char *Ptr, unsigned int &Size) {
   ++Size;
@@ -55,7 +85,6 @@ LexNextToken:
   }
 
   char Char = advance(CurPtr);
-  std::cout << Char;
   tok::TokenKind Kind;
 
   switch (Char) {
@@ -66,9 +95,35 @@ LexNextToken:
 
     return true;
 
+  //
+  // handle trivial token
+  case '\r':
+    if (*CurPtr == '\n') {
+      (void)advance(CurPtr);
+    }
+    LLVM_FALLTHROUGH;
+  case '\n':
+    SkipWhiteSpace(Result, CurPtr);
+    // Try again
+    goto LexNextToken;
+
+  case ' ':
+  case '\t':
+  case '\f':
+  case '\v':
+    SkipWhiteSpace(Result, CurPtr);
+    CurPtr = BufferPtr;
+
+    goto LexNextToken;
+    // End - handle trivial token
+    //
+
   default:
-    Kind = tok::_UNKNOWN;
-    break;
+    if (clang::isASCII(Char)) {
+      Kind = tok::_UNKNOWN;
+      std::cout << Char;
+      break;
+    }
   }
 
   FormToken(Result, CurPtr, Kind);
