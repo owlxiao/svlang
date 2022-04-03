@@ -40,6 +40,61 @@ void Lexer::SkipWhiteSpace(Token &Result, const char *CurPtr) {
   BufferPtr = CurPtr;
 }
 
+void Lexer::SkipLineComment(const char *CurPtr) {
+  char C;
+
+  while (true) {
+    C = *CurPtr;
+
+    while (C != 0 &&                 // EOF
+           C != '\n' && C != '\r') { // Newline
+      C = *++CurPtr;
+    }
+
+    // Then we skip whitespace before newline
+    const char *NextLine = CurPtr;
+    if (C != 0) {
+      // We found a newline, see if it is escaped
+      const char *EscapePtr = CurPtr - 1;
+      bool HasSpace = false;
+
+      while (clang::isHorizontalWhitespace(*EscapePtr)) {
+        --EscapePtr;
+        HasSpace = true;
+      }
+    }
+
+    CurPtr = NextLine;
+    break;
+  }
+
+  BufferPtr = CurPtr;
+}
+
+void Lexer::SkipBlockComment(const char *CurPtr) {
+  unsigned char C = advance(CurPtr);
+
+  while (true) {
+    while (CurPtr[0] != '/' && CurPtr[1] != '/' && CurPtr[2] != '/' &&
+           CurPtr[3] != '/' && CurPtr + 4 < BufferEnd) {
+      CurPtr += 4;
+    }
+
+    C = *CurPtr++;
+
+    while (C != '/' && C != '\0') {
+      C = *CurPtr++;
+    }
+
+    if (C == '/') {
+      if (CurPtr[-2] == '*') { // Found the final */
+        break;
+      }
+    }
+  }
+  BufferPtr = CurPtr;
+}
+
 // End - Helper functions
 //
 
@@ -118,6 +173,16 @@ LexNextToken:
     // End - handle trivial token
     //
 
+  case '/':
+    Char = advance(CurPtr);
+    if (Char == '/') {
+      SkipLineComment(ConsumeChar(CurPtr, 0));
+      goto LexNextToken;
+    } else if (Char == '*') {
+      SkipBlockComment(CurPtr);
+      goto LexNextToken;
+    }
+    break;
   default:
     if (clang::isASCII(Char)) {
       Kind = tok::_UNKNOWN;

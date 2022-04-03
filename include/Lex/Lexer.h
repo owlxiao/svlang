@@ -25,11 +25,14 @@ public:
   // Helper functions for lex token
 public:
   void SkipWhiteSpace(Token &Result, const char *CurPtr);
+  void SkipLineComment(const char *CurPtr);
+  void SkipBlockComment(const char *CurPtr);
 
 private:
   const char *BufferStart;
   const char *BufferEnd;
   const char *BufferPtr;
+
 };
 
 } // namespace svlang
