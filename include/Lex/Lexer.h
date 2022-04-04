@@ -32,7 +32,6 @@ private:
   const char *BufferStart;
   const char *BufferEnd;
   const char *BufferPtr;
-
 };
 
 } // namespace svlang

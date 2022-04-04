@@ -2,7 +2,7 @@
 #define SVLANG_LEX_PREPROCESSOR_H
 
 #include <llvm/Support/SourceMgr.h>
-
+#include <llvm/Support/raw_ostream.h>
 #include <memory>
 
 #include "Lex/Lexer.h"
@@ -21,6 +21,10 @@ public:
   void Lex(Token &Token);
 
   void enterMainSourceFile();
+
+  // Print the Token to stderr
+public:
+  void DumpToken(const Token &Tok) const;
 
 private:
   llvm::SourceMgr &SourceMgr;

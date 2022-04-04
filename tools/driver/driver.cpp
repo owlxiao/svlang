@@ -43,7 +43,9 @@ int main(int argc, const char **argv) {
     svlang::Token Tok;
     do {
       PP.Lex(Tok);
-    } while (Tok.isNot(tok::_EOF));
+      PP.DumpToken(Tok);
+      llvm::errs() << "\n";
+    } while (Tok.isNot(svlang::tok::_EOF));
   }
   return 0;
 }

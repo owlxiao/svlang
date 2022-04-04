@@ -1,1 +1,2 @@
-add_subdirectory(Lex)
+add_svlang_subdirectory(Lex)
+add_svlang_subdirectory(Basic)

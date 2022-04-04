@@ -1,0 +1,12 @@
+#ifndef TOK
+#define TOK(X) _##X
+#endif
+#ifndef KEYWORD
+#define KEYWORD(X, Y) TOK(_KW_ ## X)
+#endif
+
+TOK(UNKNOWN) // Not a token
+TOK(EOF)     // End of file
+
+#undef KEYWORD
+#undef TOK

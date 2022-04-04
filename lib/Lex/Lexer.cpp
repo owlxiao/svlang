@@ -114,10 +114,11 @@ const char *Lexer::ConsumeChar(const char *Ptr, unsigned int Size) {
   return Ptr + Size;
 }
 
-void Lexer::FormToken(Token &Reuslt, const char *TokEnd, tok::TokenKind Kind) {
+void Lexer::FormToken(Token &Result, const char *TokEnd, tok::TokenKind Kind) {
   unsigned int TokLen = TokEnd - BufferPtr;
-  Reuslt.setLength(TokLen);
-  Reuslt.setKind(Kind);
+  Result.setLength(TokLen);
+  Result.setLocation(TokEnd);
+  Result.setKind(Kind);
   BufferPtr = TokEnd;
 }
 
@@ -125,7 +126,7 @@ bool Lexer::Lex(Token &Result) {
 LexNextToken:
   // New Token
   Result.startToken();
-  Result.setPtrData(nullptr);
+  Result.setLiteralData(nullptr);
 
   // Cache BufferPtr
   const char *CurPtr = BufferPtr;
@@ -176,7 +177,7 @@ LexNextToken:
   case '/':
     Char = advance(CurPtr);
     if (Char == '/') {
-      SkipLineComment(ConsumeChar(CurPtr, 0));
+      SkipLineComment(CurPtr);
       goto LexNextToken;
     } else if (Char == '*') {
       SkipBlockComment(CurPtr);
@@ -186,7 +187,6 @@ LexNextToken:
   default:
     if (clang::isASCII(Char)) {
       Kind = tok::_UNKNOWN;
-      std::cout << Char;
       break;
     }
   }
