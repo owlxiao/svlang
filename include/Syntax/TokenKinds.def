@@ -21,10 +21,25 @@ TOK(EOF)     // End of file
 // — Integer, real, string, array, structure, and time literals
 // — Built-in method calls
 // — Attributes
+TOK(IDENTIFIER)
+
+// 5.6.3 System tasks and system functions
+TOK(SYSTEM_TF_IDENTIFIER)
+
+// 5.7.1 Integer literal constants
+TOK(INTEGER_LITERAL)
+
+// 5.7.2 Real literal constants
+TOK(REAL_LITERAL)
+
+// 5.8 Time literals
+TOK(TIME_LITERAL)
+
+// 5.9 String literals
+TOK(STRING_LITERAL)
 
 // 5.3 White space
 // ignored
-
 
 // 5.4 Comments
 // ignored
