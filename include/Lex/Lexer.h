@@ -28,6 +28,9 @@ public:
   void SkipLineComment(const char *CurPtr);
   void SkipBlockComment(const char *CurPtr);
 
+public:
+  llvm::SMLoc getSourceLocation(const char* Loc) const;
+
 private:
   const char *BufferStart;
   const char *BufferEnd;

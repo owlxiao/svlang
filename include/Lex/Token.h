@@ -14,6 +14,7 @@ public:
     Kind = tok::_UNKNOWN;
     PtrData = nullptr;
     Length = 0;
+    Location = nullptr;
   }
 
   void setKind(tok::TokenKind K) { Kind = K; }
@@ -22,7 +23,7 @@ public:
 
   void setLiteralData(const char *Ptr) { PtrData = const_cast<char *>(Ptr); }
 
-  void setLocation(const char *Loc) { Location = Loc; }
+  void setLocation(llvm::SMLoc Loc) { Location = Loc.getPointer(); }
 
   tok::TokenKind getKind() const { return Kind; }
 

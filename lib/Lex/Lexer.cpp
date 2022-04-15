@@ -114,10 +114,14 @@ const char *Lexer::ConsumeChar(const char *Ptr, unsigned int Size) {
   return Ptr + Size;
 }
 
+llvm::SMLoc Lexer::getSourceLocation(const char *Loc) const {
+  return llvm::SMLoc::getFromPointer(Loc);
+}
+
 void Lexer::FormToken(Token &Result, const char *TokEnd, tok::TokenKind Kind) {
   unsigned int TokLen = TokEnd - BufferPtr;
   Result.setLength(TokLen);
-  Result.setLocation(TokEnd);
+  Result.setLocation(getSourceLocation(BufferPtr));
   Result.setKind(Kind);
   BufferPtr = TokEnd;
 }
