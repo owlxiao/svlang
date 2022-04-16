@@ -38,10 +38,12 @@ public:
     return llvm::SMLoc::getFromPointer(Location);
   }
 
+  size_t getLength() const { return Length; }
+
 private:
   const char *Location;
 
-  clang::SourceLocation::UIntTy Length;
+  size_t Length;
 
   void *PtrData;
 

@@ -83,31 +83,31 @@ OPERATOR(MINUS, "-")
 OPERATOR(EXCLAIM, "!")
 
 // Unary logical reduction operators
-OPERATOR(TILDE, "~")
-OPERATOR(AMP, "&")
-OPERATOR(TILDE_AMP, "~&")
-OPERATOR(PIPE, "|")
-OPERATOR(TILDE_PIPE, "~|")
-OPERATOR(CARET, "^")
+OPERATOR(TILDE      , "~")
+OPERATOR(AMP        , "&")
+OPERATOR(TILDE_AMP  , "~&")
+OPERATOR(PIPE       , "|")
+OPERATOR(TILDE_PIPE , "~|")
+OPERATOR(CARET      , "^")
 OPERATOR(TILDE_CARET, "~^")
 OPERATOR(CARET_TILDE, "^~")
 
 // Binary arithmetic operators
-OPERATOR(PLUS, "+")
-OPERATOR(MINUS, "-")
-OPERATOR(STAR, "*")
-OPERATOR(SLASH, "/")
+// OPERATOR(PLUS     , "+")
+// OPERATOR(MINUS    , "-")
+OPERATOR(STAR     , "*")
+OPERATOR(SLASH    , "/")
 OPERATOR(STAR_STAR, "**")
 
 // Binary arithmetic modulus operator
 OPERATOR(, "%")
 
 // Binary bitwise operators
-OPERATOR(AMP        , "&" )
-OPERATOR(PIPE       , "|" )
-OPERATOR(CARET      , "^" )
-OPERATOR(CARET_TILDE, "^~")
-OPERATOR(TILDE_CARET, "~^")
+// OPERATOR(AMP        , "&" )
+// OPERATOR(PIPE       , "|" )
+// OPERATOR(CARET      , "^" )
+// OPERATOR(CARET_TILDE, "^~")
+// OPERATOR(TILDE_CARET, "~^")
 
 // Binary logical shift operators
 OPERATOR(GREATER_GREATER, ">>")
@@ -148,8 +148,8 @@ OPERATOR(PLUS_PLUS  , "++")
 OPERATOR(MINUS_MINUS, "--")
 
 // Stream, operators
-OPERATOR(GREATER_GREATER, ">>")
-OPERATOR(LESS_LESS      , "<<")
+// OPERATOR(GREATER_GREATER, ">>")
+// OPERATOR(LESS_LESS      , "<<")
 
 // Others non-operator
 PUNCTUATOR(L_SQUARE  , "[")

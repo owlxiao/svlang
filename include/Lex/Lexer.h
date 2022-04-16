@@ -22,14 +22,25 @@ public:
 
   const char *ConsumeChar(const char *Ptr, unsigned int Size);
 
+  char getCharAndSize(const char*Ptr, unsigned &Size);
+
   // Helper functions for lex token
 public:
   void SkipWhiteSpace(Token &Result, const char *CurPtr);
   void SkipLineComment(const char *CurPtr);
   void SkipBlockComment(const char *CurPtr);
 
+
 public:
   llvm::SMLoc getSourceLocation(const char* Loc) const;
+
+  // Helper functions to lex a token of the specific type
+public:
+  bool lexNumericLiteral(Token &Result, const char *CurPtr);
+
+  // Helper functions to better explain what token means
+public:
+  static std::string getSpelling(const Token &Tok);
 
 private:
   const char *BufferStart;

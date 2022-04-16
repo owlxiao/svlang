@@ -1,5 +1,6 @@
 #include "Lex/Preprocessor.h"
 #include "Basic/TokenKinds.h"
+#include "Lex/Lexer.h"
 
 namespace svlang {
 
@@ -18,8 +19,8 @@ void Preprocessor::enterMainSourceFile() {
 }
 
 void Preprocessor::DumpToken(const Token &Tok) const {
-  llvm::errs() << tok::getTokenName(Tok.getKind()) << ' '
-               << Tok.getLiteralData();
+  llvm::errs() << tok::getTokenName(Tok.getKind()) << ' ' << '`'
+               << Lexer::getSpelling(Tok) << '`';
   llvm::errs() << "\t";
   auto [Line, Col] =
       SourceMgr.getLineAndColumn(Tok.getLocation(), SourceMgr.getMainFileID());

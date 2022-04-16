@@ -1,5 +1,5 @@
-
 #include <iostream>
+#include <string>
 
 #include <llvm/Support/Compiler.h>
 
@@ -98,6 +98,23 @@ void Lexer::SkipBlockComment(const char *CurPtr) {
 // End - Helper functions
 //
 
+/*
+ * Helper functions to lex a token of the specific type
+ */
+bool Lexer::lexNumericLiteral(Token &Result, const char *CurPtr) {
+  unsigned Size;
+  char C = getCharAndSize(CurPtr, Size);
+  while (clang::isPreprocessingNumberBody(C)) {
+    CurPtr = ConsumeChar(CurPtr, Size);
+    C = getCharAndSize(CurPtr, Size);
+  }
+
+  const char *TokStart = BufferPtr;
+  FormToken(Result, CurPtr, tok::_INTEGER_LITERAL);
+  Result.setLiteralData(TokStart);
+  return true;
+}
+
 inline char Lexer::advanceChar(const char *Ptr, unsigned int &Size) {
   ++Size;
   return *Ptr;
@@ -114,6 +131,11 @@ const char *Lexer::ConsumeChar(const char *Ptr, unsigned int Size) {
   return Ptr + Size;
 }
 
+inline char Lexer::getCharAndSize(const char *Ptr, unsigned &Size) {
+  Size = 1;
+  return *Ptr;
+}
+
 llvm::SMLoc Lexer::getSourceLocation(const char *Loc) const {
   return llvm::SMLoc::getFromPointer(Loc);
 }
@@ -124,6 +146,22 @@ void Lexer::FormToken(Token &Result, const char *TokEnd, tok::TokenKind Kind) {
   Result.setLocation(getSourceLocation(BufferPtr));
   Result.setKind(Kind);
   BufferPtr = TokEnd;
+}
+
+std::string Lexer::getSpelling(const Token &Tok) {
+  std::string Result;
+  Result.resize(Tok.getLength());
+  size_t length = 0;
+  char *spelling = &*Result.begin();
+  const char *TokStart = Tok.getLocation().getPointer();
+  const char *TokEnd = TokStart + Tok.getLength();
+  char *bufPtr = const_cast<char *>(TokStart);
+  while (bufPtr < TokEnd) {
+    spelling[length++] = *bufPtr;
+    ++bufPtr;
+  }
+  Result.resize(length);
+  return Result;
 }
 
 bool Lexer::Lex(Token &Result) {
@@ -188,6 +226,19 @@ LexNextToken:
       goto LexNextToken;
     }
     break;
+
+  case '0':
+  case '1':
+  case '2':
+  case '3':
+  case '4':
+  case '5':
+  case '6':
+  case '7':
+  case '8':
+  case '9':
+    return lexNumericLiteral(Result, CurPtr);
+
   default:
     if (clang::isASCII(Char)) {
       Kind = tok::_UNKNOWN;
