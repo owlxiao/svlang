@@ -22,4 +22,3 @@ macro(add_svlang_executable name)
     add_llvm_executable(${name} ${ARGN})
 endmacro()
 
-

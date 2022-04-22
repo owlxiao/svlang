@@ -1,4 +1,4 @@
- add_executable(driver driver.cpp)
+add_executable(driver driver.cpp)
 
 target_link_libraries(driver
  svlangLex
