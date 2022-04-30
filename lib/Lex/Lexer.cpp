@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <string>
 
@@ -103,14 +104,27 @@ void Lexer::SkipBlockComment(const char *CurPtr) {
  */
 bool Lexer::lexNumericLiteral(Token &Result, const char *CurPtr) {
   unsigned Size;
+  char preChar = 0;
+  bool isRealNumber = false;
   char C = getCharAndSize(CurPtr, Size);
   while (clang::isPreprocessingNumberBody(C)) {
     CurPtr = ConsumeChar(CurPtr, Size);
+    preChar = C;
     C = getCharAndSize(CurPtr, Size);
   }
+  // check for a sign under e
+  // e.g. 1.30e-2
+  if ((C == '-' || C == '+') && (preChar == 'E' || preChar == 'e')) {
+    return lexNumericLiteral(Result, ConsumeChar(CurPtr, Size));
+  }
+
+  isRealNumber = std::find_if(BufferPtr, CurPtr, [](const char C) {
+                   return (C == '.') || (C == 'e') || (C == 'E');
+                 }) != CurPtr;
 
   const char *TokStart = BufferPtr;
-  FormToken(Result, CurPtr, tok::_INTEGER_LITERAL);
+  FormToken(Result, CurPtr,
+            isRealNumber ? tok::_REAL_LITERAL : tok::_INTEGER_LITERAL);
   Result.setLiteralData(TokStart);
   return true;
 }

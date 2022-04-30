@@ -86,3 +86,20 @@ multiple lines
 */)";
   CheckLex(text, ExpectedNullTokens);
 }
+using expectedToken = llvm::ArrayRef<svlang::tok::TokenKind>;
+/*
+ * 5.7 Numbers
+ * */
+TEST_F(LexerTest, Lex_Numbers_Real_literal_Constants) {
+  std::vector<svlang::tok::TokenKind> eTokens{9, svlang::tok::_REAL_LITERAL};
+  auto &test = "1.2\n"
+               "0.1\n"
+               "2394.26331\n"
+               "1.2E12\n"
+               "1.30e-2\n"
+               "0.1e-0\n"
+               "23E10\n"
+               "29E-2\n"
+               "236.123_763_e-12\n";
+  CheckLex(test, eTokens);
+}
