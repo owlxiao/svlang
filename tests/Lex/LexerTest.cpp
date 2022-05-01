@@ -222,3 +222,14 @@ TEST_F(LexerTest, Lex_Numbers_Real_literal_Constants) {
                "236.123_763_e-12\n";
   CheckLex(test, eTokens);
 }
+
+/*
+ * 5.8 Time literals
+ * */
+TEST_F(LexerTest, Lex_Time_Literals) {
+  std::vector<svlang::tok::TokenKind> eTokens{2, svlang::tok::_TIME_LITERAL};
+
+  auto &test = "2.1ns\n"
+               "40ps";
+  CheckLex(test, eTokens);
+}

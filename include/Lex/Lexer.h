@@ -39,6 +39,8 @@ public:
   bool lexNumericLiteral(Token &Result, const char *CurPtr);
   bool lexBaseFormat(Token &Result, const char *CurPtr);
 
+  bool isTimeUnit(const char *C) const;
+
   // Helper functions to better explain what token means
 public:
   static std::string getSpelling(const Token &Tok);

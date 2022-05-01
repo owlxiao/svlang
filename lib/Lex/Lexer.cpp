@@ -103,10 +103,18 @@ void Lexer::SkipBlockComment(const char *CurPtr) {
 /*
  * Helper functions to lex a token of the specific type
  */
+
+bool Lexer::isTimeUnit(const char *C) const {
+  return (*C == 's') ||
+         ((C[1] == 's') && ((C[0] == 'm') || (C[0] == 'u') || (C[0] == 'n') ||
+                            (C[0] == 'p') || (C[0] == 'f')));
+}
+
 bool Lexer::lexNumericLiteral(Token &Result, const char *CurPtr) {
   unsigned Size;
   char preChar = 0;
   bool isRealNumber = false;
+  bool isTimeLiteral = false;
   char C = getCharAndSize(CurPtr, Size);
   while (clang::isPreprocessingNumberBody(C)) {
     CurPtr = ConsumeChar(CurPtr, Size);
@@ -122,10 +130,15 @@ bool Lexer::lexNumericLiteral(Token &Result, const char *CurPtr) {
   isRealNumber = std::find_if(BufferPtr, CurPtr, [](const char C) {
                    return (C == '.') || (C == 'e') || (C == 'E');
                  }) != CurPtr;
+  isTimeLiteral = std::find_if(BufferPtr, CurPtr, [this](const char C) {
+                    return isTimeUnit(&C);
+                  }) != CurPtr;
 
   const char *TokStart = BufferPtr;
   FormToken(Result, CurPtr,
-            isRealNumber ? tok::_REAL_LITERAL : tok::_INTEGER_LITERAL);
+            isTimeLiteral  ? tok::_TIME_LITERAL
+            : isRealNumber ? tok::_REAL_LITERAL
+                           : tok::_INTEGER_LITERAL);
   Result.setLiteralData(TokStart);
   return true;
 }
