@@ -16,7 +16,7 @@ public:
 
   char advanceChar(const char *Ptr, unsigned int &Size);
 
-  char advance(const char *&Ptr);
+  char getAndAdcanceChar(const char *&Ptr);
 
   void FormToken(Token &Result, const char *TokEnd, tok::TokenKind Kind);
 
@@ -37,6 +37,7 @@ public:
   // Helper functions to lex a token of the specific type
 public:
   bool lexNumericLiteral(Token &Result, const char *CurPtr);
+  bool lexBaseFormat(Token &Result, const char *CurPtr);
 
   // Helper functions to better explain what token means
 public:
@@ -46,6 +47,8 @@ private:
   const char *BufferStart;
   const char *BufferEnd;
   const char *BufferPtr;
+
+  Token lastToken;
 };
 
 } // namespace svlang

@@ -14,6 +14,7 @@ Lexer::Lexer(llvm::SourceMgr &SM) {
   BufferStart = SM.getMemoryBuffer(MainFileID)->getBufferStart();
   BufferPtr = SM.getMemoryBuffer(MainFileID)->getBufferStart();
   BufferEnd = SM.getMemoryBuffer(MainFileID)->getBufferEnd();
+  lastToken.startToken();
 }
 
 //
@@ -73,7 +74,7 @@ void Lexer::SkipLineComment(const char *CurPtr) {
 }
 
 void Lexer::SkipBlockComment(const char *CurPtr) {
-  unsigned char C = advance(CurPtr);
+  unsigned char C = getAndAdcanceChar(CurPtr);
 
   while (true) {
     while (CurPtr[0] != '/' && CurPtr[1] != '/' && CurPtr[2] != '/' &&
@@ -129,13 +130,41 @@ bool Lexer::lexNumericLiteral(Token &Result, const char *CurPtr) {
   return true;
 }
 
+bool Lexer::lexBaseFormat(Token &Result, const char *CurPtr) {
+  char C = getAndAdcanceChar(CurPtr);
+  tok::TokenKind kind;
+
+  switch (C) {
+  case '0':
+  case '1':
+  case 'x':
+  case 'X':
+  case 'z':
+  case 'Z':
+  case '?':
+    kind = tok::_UNBASED_UNSIZED_LITERAL;
+    break;
+  case 's':
+  case 'S':
+    return lexBaseFormat(Result, CurPtr);
+  default:
+    kind = tok::_INTEGER_BASE;
+    break;
+  }
+
+  const char *TokStart = BufferPtr;
+  FormToken(Result, CurPtr, kind);
+  Result.setLiteralData(TokStart);
+  return true;
+}
+
 inline char Lexer::advanceChar(const char *Ptr, unsigned int &Size) {
   ++Size;
   return *Ptr;
 }
 
-inline char Lexer::advance(const char *&Ptr) {
-  unsigned int Size = 0;
+inline char Lexer::getAndAdcanceChar(const char *&Ptr) {
+  unsigned Size = 0;
   char C = advanceChar(Ptr, Size);
   Ptr += Size;
   return C;
@@ -160,6 +189,8 @@ void Lexer::FormToken(Token &Result, const char *TokEnd, tok::TokenKind Kind) {
   Result.setLocation(getSourceLocation(BufferPtr));
   Result.setKind(Kind);
   BufferPtr = TokEnd;
+  lastToken = Result;
+  // FormToken(lastToken, TokEnd, Kind);
 }
 
 std::string Lexer::getSpelling(const Token &Tok) {
@@ -196,7 +227,7 @@ LexNextToken:
     BufferPtr = CurPtr;
   }
 
-  char Char = advance(CurPtr);
+  char Char = getAndAdcanceChar(CurPtr);
   tok::TokenKind Kind;
 
   switch (Char) {
@@ -211,7 +242,7 @@ LexNextToken:
   // handle trivial token
   case '\r':
     if (*CurPtr == '\n') {
-      (void)advance(CurPtr);
+      (void)getAndAdcanceChar(CurPtr);
     }
     LLVM_FALLTHROUGH;
   case '\n':
@@ -231,7 +262,7 @@ LexNextToken:
     //
 
   case '/':
-    Char = advance(CurPtr);
+    Char = getAndAdcanceChar(CurPtr);
     if (Char == '/') {
       SkipLineComment(CurPtr);
       goto LexNextToken;
@@ -240,19 +271,44 @@ LexNextToken:
       goto LexNextToken;
     }
     break;
-
-  case '0':
-  case '1':
-  case '2':
-  case '3':
-  case '4':
-  case '5':
-  case '6':
-  case '7':
-  case '8':
-  case '9':
+  // clang-format off
+  case '0':  case '1':
+  case '2':  case '3':
+  case '4':  case '5':
+  case '6':  case '7':
+  case '8':  case '9':
+    // clang-format on
     return lexNumericLiteral(Result, CurPtr);
 
+  case '\'':
+    return lexBaseFormat(Result, CurPtr);
+  // clang-format off
+  case 'A':  case 'B':  case 'C':  case 'D':
+  case 'E':  case 'F':  case 'G':  case 'H':
+  case 'I':  case 'J':  case 'K':  case 'L':
+  case 'M':  case 'N':  case 'O':  case 'P':
+  case 'Q':  case 'R':  case 'S':  case 'T':
+  case 'U':  case 'V':  case 'W':  case 'X':
+  case 'Y':  case 'Z':  case 'a':  case 'b':
+  case 'c':  case 'd':  case 'e':  case 'f':
+  case 'g':  case 'h':  case 'i':  case 'j':
+  case 'k':  case 'l':  case 'm':  case 'n':
+  case 'o':  case 'p':  case 'q':  case 'r':
+  case 's':  case 't':  case 'u':  case 'v':
+  case 'w':  case 'x':  case 'y':  case 'z':
+  case '_':
+    // clang-format on
+    if (lastToken.is(tok::_INTEGER_BASE)) {
+      if (clang::isHexDigit(Char) || (Char == 'x') || (Char == 'X') ||
+          (Char == 'z') || (Char == 'Z')) {
+        return lexNumericLiteral(Result, CurPtr);
+      }
+    }
+
+  case '?':
+    if (lastToken.is(tok::_INTEGER_BASE)) {
+      return lexNumericLiteral(Result, CurPtr);
+    }
   default:
     if (clang::isASCII(Char)) {
       Kind = tok::_UNKNOWN;

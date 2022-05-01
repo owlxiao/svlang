@@ -90,6 +90,125 @@ using expectedToken = llvm::ArrayRef<svlang::tok::TokenKind>;
 /*
  * 5.7 Numbers
  * */
+
+// 5.7.1 Integer literal constants
+// Example 1: Unsized literal constant numbers
+TEST_F(LexerTest, Lex_Numbers_Integer_Literal_Constants_Unsized) {
+  std::vector<svlang::tok::TokenKind> eTokens;
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  auto &test = "659\n"
+               "'h 837FF\n"
+               "'o7460\n";
+  CheckLex(test, eTokens);
+}
+
+// Example 2: Sized literal constant numbers
+TEST_F(LexerTest, Lex_Numbers_Integer_Literal_Constants_Sized) {
+  std::vector<svlang::tok::TokenKind> eTokens;
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+
+  auto &test = "4'b1001\n"
+               "5 'D 3\n"
+               "3'b01x\n"
+               "12'hx\n"
+               "12'hz\n";
+  CheckLex(test, eTokens);
+}
+
+// Example 3: Using sign with literal constant numbers
+// TODO: Support sign operator
+TEST_F(LexerTest, Lex_Numbers_Integer_Literal_Constants_Sign) {
+  std::vector<svlang::tok::TokenKind> eTokens;
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+
+  auto &test = "4 'shf\n"
+               "16'sd?\n";
+  CheckLex(test, eTokens);
+}
+
+// Example 4: Automatic left padding of literal constant numbers
+TEST_F(LexerTest,
+       Lex_Numbers_Integer_Literal_Constants_Automatic_Left_Padding) {
+  std::vector<svlang::tok::TokenKind> eTokens;
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  auto &test = "'h x\n"
+               "'h 3x\n"
+               "'h z3\n"
+               "'h 0z3"
+               "'h5\n"
+               "'hx\n"
+               "'hz\n";
+  CheckLex(test, eTokens);
+}
+
+// Example 5: Automatic left padding of constant literal numbers using a
+// single-bit value
+TEST_F(
+    LexerTest,
+    Lex_Numbers_Integer_Literal_Constants_Automatic_Left_Padding_Using_a_signle_bit_value) {
+  std::vector<svlang::tok::TokenKind> eTokens{
+      4, svlang::tok::_UNBASED_UNSIZED_LITERAL};
+  auto &test = "'0\n"
+               "'1\n"
+               "'x\n"
+               "'z";
+  CheckLex(test, eTokens);
+}
+
+// Example 6: Underscores in literal constant numbers
+TEST_F(
+    LexerTest,
+    Lex_Numbers_Integer_Literal_Constants_Underscores_in_literal_constant_numbers) {
+  std::vector<svlang::tok::TokenKind> eTokens;
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  eTokens.push_back(svlang::tok::_INTEGER_BASE);
+  eTokens.push_back(svlang::tok::_INTEGER_LITERAL);
+  auto &test = "27_195_000\n"
+               "16'b0011_0101_1111\n"
+               "32 'h 12ab_f001";
+  CheckLex(test, eTokens);
+}
+
 TEST_F(LexerTest, Lex_Numbers_Real_literal_Constants) {
   std::vector<svlang::tok::TokenKind> eTokens{9, svlang::tok::_REAL_LITERAL};
   auto &test = "1.2\n"
