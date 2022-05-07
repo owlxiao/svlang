@@ -1,6 +1,8 @@
 #ifndef SVLANG_BASIC_CHARINFO_H
 #define SVLANG_BASIC_CHARINFO_H
 
+#include <cstdint>
+
 #include <clang/Basic/CharInfo.h>
 #include <llvm/Support/Compiler.h>
 
@@ -70,4 +72,25 @@ const uint16_t clang::charinfo::InfoTable[256] = {
     CHAR_LOWER, CHAR_LOWER, CHAR_LOWER, CHAR_RAWDEL, CHAR_RAWDEL, CHAR_RAWDEL,
     CHAR_RAWDEL, 0};
 
+namespace svlang {
+
+LLVM_READONLY inline bool isOctalNumber(const unsigned char c) {
+  return c >= '0' && c<='7';
+}
+
+LLVM_READONLY inline uint8_t getDigitValue(const unsigned char c) {
+  return static_cast<uint8_t>(c - '0');
+}
+
+LLVM_READONLY inline uint8_t getHexDigitValue(const unsigned char c) {
+  if (c <= '9') {
+    return static_cast<uint8_t>(c-'0');
+  }
+  if(c<='F') {
+    return static_cast<uint8_t>(10+c-'A');
+  }
+  return static_cast<uint8_t>(10 + c -'a');
+}
+
+}
 #endif // SVLANG_BASIC_CHARINFO

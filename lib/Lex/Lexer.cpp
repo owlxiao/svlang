@@ -1,7 +1,9 @@
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <string>
 
+#include <llvm/ADT/SmallString.h>
 #include <llvm/Support/Compiler.h>
 
 #include "Basic/CharInfo.h"
@@ -140,6 +142,70 @@ bool Lexer::lexNumericLiteral(Token &Result, const char *CurPtr) {
             : isRealNumber ? tok::_REAL_LITERAL
                            : tok::_INTEGER_LITERAL);
   Result.setLiteralData(TokStart);
+  return true;
+}
+
+bool Lexer::lexStringLiteral(Token &Result, const char *CurPtr) {
+  // TODO: Fix limit to the length of a string literal
+  auto String = std::make_unique<llvm::SmallString<128>>();
+  size_t char2digits;
+  char C;
+
+  while (true) {
+    C = getAndAdcanceChar(CurPtr);
+    // Handle Specifying special characters
+    if (C == '"') {
+      break;
+    }
+
+    if (C == '\\') {
+      C = getAndAdcanceChar(CurPtr);
+
+      switch (C) {
+      // clang-format off
+      case 'n' : String->push_back ('\n'); break; /* Newline character  */
+      case 't' : String->push_back('\t'); break; /* Tab character      */
+      case '\\': String->push_back('\\'); break; /* \ character        */
+      case '"' : String->push_back('"' ); break; /* " character        */
+      case 'v' : String->push_back('\v'); break; /* vertical character */
+      case 'f' : String->push_back('\f'); break; /* form feed          */
+      case 'a' : String->push_back('\a'); break; /* bell               */
+
+      // handle \ddd
+      case '0': case '1': case '2': case '3':
+      case '4': case '5': case '6': case '7':
+        // clang-format on
+        char2digits = getDigitValue(C);
+        if (isOctalNumber(*CurPtr)) {
+          C = getAndAdcanceChar(CurPtr);
+          char2digits = (char2digits * 8) + getDigitValue(C);
+          if (isOctalNumber(*CurPtr)) {
+            C = getAndAdcanceChar(CurPtr);
+            char2digits = (char2digits * 8) + getDigitValue(C);
+          }
+        }
+        String->push_back(static_cast<char>(char2digits));
+        break;
+
+      case 'x':
+        char2digits = getHexDigitValue(C = getAndAdcanceChar(CurPtr));
+        if (clang::isHexDigit(*CurPtr)) {
+          C = getAndAdcanceChar(CurPtr);
+          char2digits = (char2digits * 16) + getHexDigitValue(C);
+        }
+        String->push_back(static_cast<char>(char2digits));
+        break;
+
+      default:
+        break;
+      }
+    } else {
+      String->push_back(C);
+    }
+  }
+
+  FormToken(Result, CurPtr, svlang::tok::_STRING_LITERAL);
+  Result.setLiteralData(&*String->begin());
   return true;
 }
 
@@ -284,7 +350,7 @@ LexNextToken:
       goto LexNextToken;
     }
     break;
-  // clang-format off
+    // clang-format off
   case '0':  case '1':
   case '2':  case '3':
   case '4':  case '5':
@@ -295,7 +361,11 @@ LexNextToken:
 
   case '\'':
     return lexBaseFormat(Result, CurPtr);
-  // clang-format off
+
+  case '"':
+    return lexStringLiteral(Result, CurPtr);
+
+    // clang-format off
   case 'A':  case 'B':  case 'C':  case 'D':
   case 'E':  case 'F':  case 'G':  case 'H':
   case 'I':  case 'J':  case 'K':  case 'L':

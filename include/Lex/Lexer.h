@@ -38,6 +38,7 @@ public:
 public:
   bool lexNumericLiteral(Token &Result, const char *CurPtr);
   bool lexBaseFormat(Token &Result, const char *CurPtr);
+  bool lexStringLiteral(Token &Result, const char *CurPtr);
 
   bool isTimeUnit(const char *C) const;
 

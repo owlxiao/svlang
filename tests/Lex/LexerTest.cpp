@@ -50,6 +50,13 @@ protected:
     }
     return toks;
   }
+
+  void cmpString(svlang::Token Token, std::string_view eString) {
+    // if (eString.compare(Token.getLiteralData())) {
+    EXPECT_EQ(eString, Token.getLiteralData())
+        << "Expect String:" << eString << std::endl
+        << "Actual String:" << Token.getLiteralData() << std::endl;
+  }
 };
 
 /*
@@ -232,4 +239,49 @@ TEST_F(LexerTest, Lex_Time_Literals) {
   auto &test = "2.1ns\n"
                "40ps";
   CheckLex(test, eTokens);
+}
+
+/*
+ * 5.9 String literals
+ * */
+// Example 1:
+TEST_F(LexerTest, Lex_String_Literals_A_backslash) {
+  std::vector<svlang::tok::TokenKind> eTokens{1, svlang::tok::_STRING_LITERAL};
+  auto &test =
+      R"("Humpty Dumpty sat on a wall. \
+Humpty Dumpty had a great fall")";
+  cmpString(CheckLex(test, eTokens)[0],
+            "Humpty Dumpty sat on a wall. Humpty Dumpty had a great fall");
+}
+
+// Example 2:
+TEST_F(LexerTest, Lex_String_Literals_Escape_string_before_backslash) {
+  std::vector<svlang::tok::TokenKind> eTokens{1, svlang::tok::_STRING_LITERAL};
+  auto &test =
+      R"("Humpty Dumpty sat on a wall.\n\
+Humpty Dumpty had a great fall")";
+  cmpString(CheckLex(test, eTokens)[0],
+            "Humpty Dumpty sat on a wall.\nHumpty Dumpty had a great fall");
+}
+
+// Example 3:  Special characters in strings
+// \ddd
+TEST_F(LexerTest, Lex_String_Literals_Escape_string_ddd) {
+  std::vector<svlang::tok::TokenKind> eTokens{1, svlang::tok::_STRING_LITERAL};
+  auto &test = R"("\110\145\154\154\157\40\127\157\162\154\144")";
+  cmpString(CheckLex(test, eTokens)[0], "Hello World");
+}
+
+// \xdd
+TEST_F(LexerTest, Lex_String_Literals_Escape_string_xdd) {
+  std::vector<svlang::tok::TokenKind> eTokens{1, svlang::tok::_STRING_LITERAL};
+  auto &test = R"("\x48\x65\x6c\x6c\x6f\x20\x57\x6f\x72\x6c\x64")";
+  cmpString(CheckLex(test, eTokens)[0], "Hello World");
+}
+
+// Others
+TEST_F(LexerTest, Lex_String_Literals_Escape_string_others) {
+  std::vector<svlang::tok::TokenKind> eTokens{1, svlang::tok::_STRING_LITERAL};
+  auto &test = R"("\"Hello World\" \\n\\t\\v\\f\\a")";
+  cmpString(CheckLex(test, eTokens)[0], "\"Hello World\" \\n\\t\\v\\f\\a");
 }
