@@ -308,6 +308,7 @@ LexNextToken:
 
   char Char = getAndAdcanceChar(CurPtr);
   tok::TokenKind Kind;
+  unsigned SizeTmp;
 
   switch (Char) {
   case 0:
@@ -340,14 +341,27 @@ LexNextToken:
     // End - handle trivial token
     //
 
+    // /
+    // /=
+    // //
+    // /*
   case '/':
-    Char = getAndAdcanceChar(CurPtr);
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    // Comments
     if (Char == '/') {
       SkipLineComment(CurPtr);
       goto LexNextToken;
     } else if (Char == '*') {
       SkipBlockComment(CurPtr);
       goto LexNextToken;
+    }
+    // Binary arithmetic assignment operator
+    if (Char == '=') {
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_SLASH_EQUAL;
+    } else {
+      // Binary arithmetic operator
+      Kind = tok::_SLASH;
     }
     break;
     // clang-format off
@@ -359,8 +373,44 @@ LexNextToken:
     // clang-format on
     return lexNumericLiteral(Result, CurPtr);
 
+    // '{
   case '\'':
+    // 7.9.11 Associative array literals:
+    // 10.10.1 Unpacked array concatenations compared with array assignment
+    // patterns
+    if (getCharAndSize(CurPtr, SizeTmp) == '{') {
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_APOSTROPHE_L_BRACE;
+      break;
+    }
     return lexBaseFormat(Result, CurPtr);
+
+    // (
+    // (*
+  case '(':
+    // 5.12 Attributes
+    if (getCharAndSize(CurPtr, SizeTmp) == '*') {
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_L_PAREN_STAR;
+    } else {
+      Kind = tok::_L_PAREN;
+    }
+    break;
+
+    // )
+  case ')':
+    Kind = tok::_R_PAREN;
+    break;
+
+    // {
+  case '{':
+    Kind = tok::_L_BRACE;
+    break;
+
+    // }
+  case '}':
+    Kind = tok::_R_BRACE;
+    break;
 
   case '"':
     return lexStringLiteral(Result, CurPtr);
@@ -388,10 +438,414 @@ LexNextToken:
       }
     }
 
+    // =
+    // ==
+    // ===
+    // ==?
+  case '=':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    if (Char == '=') {
+      (void)getAndAdcanceChar(CurPtr);
+      switch (getCharAndSize(CurPtr, SizeTmp)) {
+        // Binary case equality operators
+        // a === b: a equal to b, including x and z
+      case '=':
+        Kind = tok::_EQUAL_EQUAL_EQUAL;
+        CurPtr = ConsumeChar(CurPtr, SizeTmp);
+        break;
+
+        // Binary wildcard equality operators
+        // a ==? b: a equals b, X and Z values in b act as wildcards
+      case '?':
+        Kind = tok::_EQUAL_EQUAL_QUESTION;
+        CurPtr = ConsumeChar(CurPtr, SizeTmp);
+        break;
+
+      // Binary logical equality operators
+      // a == b: a equal to b, result can be unknown
+      default:
+        Kind = tok::_EQUAL_EQUAL;
+        break;
+      }
+    } else {
+      // Binary assignment operator
+      Kind = tok::_EQUAL;
+      // CurPtr = ConsumeChar(CurPtr, SizeTmp);
+    }
+    break;
+
+    // +
+    // ++
+    // +=
+    // +:
+  case '+':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    switch (Char) {
+      // Unary increment, decrement operators
+    case '+':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_PLUS_PLUS;
+      break;
+    // Binary arithmetic assignment operators
+    case '=':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_PLUS_EQUAL;
+      break;
+    // Vector bit-select
+    case ':':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_PLUS_COLON;
+      break;
+      // Binary arithmetic operators
+      // a + b: a plus b
+    default:
+      Kind = tok::_PLUS;
+      break;
+    }
+    break;
+
+    // -
+    // --
+    // -=
+    // -:
+    // ->
+  case '-':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    switch (Char) {
+      // Unary decrement operators
+    case '-':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_MINUS_MINUS;
+      break;
+    // Binary arithmetic assignment operators
+    case '=':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_MINUS_EQUAL;
+      break;
+    // Vector bit-select
+    case ':':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_MINUS_COLON;
+      break;
+
+    case '>':
+      (void)getAndAdcanceChar(CurPtr);
+      // event_trigger
+      if (getCharAndSize(CurPtr, SizeTmp) == '>') {
+        Kind = tok::_MINUS_GREATER_GREATER;
+        CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      } else {
+        // Binary logical operators
+        Kind = tok::_ARROW;
+      }
+      break;
+
+    default:
+      Kind = tok::_MINUS;
+      break;
+    }
+    break;
+
+    // *
+    // **
+    // *=
+    // *>
+    // *)
+  case '*':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    switch (Char) {
+    case '*':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_STAR_STAR;
+      break;
+    case '=':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_STAR_EQUAL;
+      break;
+      // 30.4.5 Full connection and parallel connection paths
+    case '>':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_STAR_GREATER;
+      break;
+      // 5.12 Attributes
+    case ')':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_STAR_R_PAREN;
+      break;
+    default:
+      Kind = tok::_STAR;
+      break;
+    }
+    break;
+
+    // %
+    // %=
+  case '%':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    if (Char == '=') {
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_PERCENT_EQUAL;
+      break;
+    }
+    // 11.4.3 Arithmetic operators
+    // a%b: a modulo b
+    Kind = tok::_PERCENT;
+    break;
+
+    // &
+    // &&
+    // &&&
+    // &=
+  case '&':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    switch (Char) {
+    case '&':
+      (void)getAndAdcanceChar(CurPtr);
+      if (getCharAndSize(CurPtr, SizeTmp) == '&') {
+        CurPtr = ConsumeChar(CurPtr, SizeTmp);
+        Kind = tok::_AMP_AMP_AMP;
+      } else {
+        Kind = tok::_AMP_AMP;
+      }
+      break;
+    case '=':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_AMP_EQUAL;
+      break;
+    default:
+      Kind = tok::_AMP;
+      break;
+    }
+    break;
+
+    // |
+    // ||
+    // |=
+    // |->
+  case '|':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    switch (Char) {
+    case '|':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_PIPE_PIPE;
+      break;
+    case '-':
+      (void)getAndAdcanceChar(CurPtr);
+      if (getCharAndSize(CurPtr, SizeTmp) == '>') {
+        CurPtr = ConsumeChar(CurPtr, SizeTmp);
+        Kind = tok::_PIPE_MINUS_GREATER;
+        break;
+      }
+      Kind = tok::_PIPE;
+      break;
+    case '=':
+      (void)getAndAdcanceChar(CurPtr);
+      if (getCharAndSize(CurPtr, SizeTmp) == '>') {
+        CurPtr = ConsumeChar(CurPtr, SizeTmp);
+        Kind = tok::_PIPE_EQUAL_GREATER;
+        break;
+      }
+      Kind = tok::_PIPE_EQUAL;
+      break;
+    default:
+      Kind = tok::_PIPE;
+    }
+    break;
+
+    // ^
+    // ^~
+    // ^=
+  case '^':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    switch (Char) {
+    case '~':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_CARET_TILDE;
+      break;
+    case '=':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_CARET_EQUAL;
+      break;
+    default:
+      Kind = tok::_CARET;
+      break;
+    }
+    break;
+
+    // <
+    // <=
+    // <<
+    // <<=
+    // <<<
+    // <<<=
+  case '<':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    switch (Char) {
+    case '=':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_LESS_EQUAL;
+      break;
+    case '-':
+      (void)getAndAdcanceChar(CurPtr);
+      if (getCharAndSize(CurPtr, SizeTmp) == '>') {
+        CurPtr = ConsumeChar(CurPtr, SizeTmp);
+        Kind = tok::_LESS_MINUS_GREATER;
+        break;
+      }
+      Kind = tok::_LESS;
+      break;
+    case '<':
+      (void)getAndAdcanceChar(CurPtr);
+      switch (getCharAndSize(CurPtr, SizeTmp)) {
+      case '<':
+        (void)getAndAdcanceChar(CurPtr);
+        if (getCharAndSize(CurPtr, SizeTmp) == '=') {
+          CurPtr = ConsumeChar(CurPtr, SizeTmp);
+          Kind = tok::_LESS_LESS_LESS_EQUAL;
+          break;
+        }
+        Kind = tok::_LESS_LESS_LESS;
+        break;
+      case '=':
+        CurPtr = ConsumeChar(CurPtr, SizeTmp);
+        Kind = tok::_LESS_LESS_EQUAL;
+        break;
+      default:
+        Kind = tok::_LESS_LESS;
+        break;
+      }
+      break;
+    default:
+      Kind = tok::_LESS;
+      break;
+    }
+    break;
+
+    // >
+    // >=
+    // >>
+    // >>>
+    // >>=
+    // >>>=
+  case '>':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    switch (Char) {
+    case '=':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_GREATER_EQUAL;
+      break;
+    case '>':
+      (void)getAndAdcanceChar(CurPtr);
+      switch (getCharAndSize(CurPtr, SizeTmp)) {
+      case '=':
+        CurPtr = ConsumeChar(CurPtr, SizeTmp);
+        Kind = tok::_GREATER_GREATER_EQUAL;
+        break;
+      case '>':
+        (void)getAndAdcanceChar(CurPtr);
+        if (getCharAndSize(CurPtr, SizeTmp) == '=') {
+          CurPtr = ConsumeChar(CurPtr, SizeTmp);
+          Kind = tok::_GREATER_GREATER_GREATER_EQUAL;
+        } else {
+          Kind = tok::_GREATER_GREATER_GREATER;
+        }
+        break;
+      default:
+        Kind = tok::_GREATER_GREATER;
+        break;
+      }
+      break;
+    default:
+      Kind = tok::_GREATER;
+      break;
+    }
+    break;
+
+    // ?
   case '?':
     if (lastToken.is(tok::_INTEGER_BASE)) {
       return lexNumericLiteral(Result, CurPtr);
+    } else {
+      Kind = tok::_QUESTION;
     }
+    break;
+
+    // :
+    // :=
+    // :/
+    // ::
+  case ':':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    switch (Char) {
+    case '=':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_COLON_EQUAL;
+      break;
+    case '/':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_COLON_SLASH;
+      break;
+    case ':':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_COLON_COLON;
+      break;
+    default:
+      Kind = tok::_COLON;
+      break;
+    }
+    break;
+
+    // !
+    // !=
+    // !==
+    // !=?
+  case '!':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    if (Char == '=') {
+      (void)getAndAdcanceChar(CurPtr);
+      switch (getCharAndSize(CurPtr, SizeTmp)) {
+      case '=':
+        CurPtr = ConsumeChar(CurPtr, SizeTmp);
+        Kind = tok::_EXCLAIM_EQUAL_EQUAL;
+        break;
+      case '?':
+        CurPtr = ConsumeChar(CurPtr, SizeTmp);
+        Kind = tok::_EXCLAIM_EQUAL_QUESTION;
+        break;
+      default:
+        Kind = tok::_EXCLAIM_EQUAL;
+        break;
+      }
+    } else {
+      Kind = tok::_EXCLAIM;
+    }
+    break;
+
+    // ~
+    // ~&
+    // ~|
+    // ~^
+  case '~':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    switch (Char) {
+    case '&':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_TILDE_AMP;
+      break;
+    case '|':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_TILDE_PIPE;
+      break;
+    case '^':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_TILDE_CARET;
+      break;
+    default:
+      Kind = tok::_TILDE;
+      break;
+    }
+    break;
+
   default:
     if (clang::isASCII(Char)) {
       Kind = tok::_UNKNOWN;

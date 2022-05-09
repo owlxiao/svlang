@@ -102,7 +102,7 @@ OPERATOR(SLASH    , "/")
 OPERATOR(STAR_STAR, "**")
 
 // Binary arithmetic modulus operator
-OPERATOR(, "%")
+OPERATOR(PERCENT, "%")
 
 // Binary bitwise operators
 // OPERATOR(AMP        , "&" )
@@ -153,18 +153,44 @@ OPERATOR(MINUS_MINUS, "--")
 // OPERATOR(GREATER_GREATER, ">>")
 // OPERATOR(LESS_LESS      , "<<")
 
+// 5.10 Structure literals
+
+OPERATOR(STAR_GREATER, "*>" )
+OPERATOR(AMP_AMP_AMP , "&&&")
+
+/*
+ * Others
+ * */
+OPERATOR(MINUS_GREATER_GREATER, "->>")
+OPERATOR(PIPE_MINUS_GREATER, "|->")
+OPERATOR(PIPE_EQUAL_GREATER, "|=>")
+
+// Vector bit-select operator
+OPERATOR(PLUS_COLON  , "+:" )
+OPERATOR(MINUS_COLON , "-:" )
+
+// 18.5.4 Distribution
+OPERATOR(COLON_EQUAL, ":=")
+OPERATOR(COLON_SLASH, ":/")
+
+// 8.23 Class scope resolution operator ::
+OPERATOR(COLON_COLON, "::")
+
 // Others non-operator
-PUNCTUATOR(L_SQUARE  , "[")
-PUNCTUATOR(R_SQUARE  , "]")
-PUNCTUATOR(L_PAREN   , "(")
-PUNCTUATOR(R_PAREN   , ")")
-PUNCTUATOR(L_BRACE   , "{")
-PUNCTUATOR(R_BRACE   , "}")
-PUNCTUATOR(PERIOD    , ".")
-PUNCTUATOR(COMMA     , ",")
-PUNCTUATOR(HASH      , "#")
-PUNCTUATOR(BACKQUOTE , "`")
-PUNCTUATOR(APOSTROPHE, "'")
+PUNCTUATOR(L_SQUARE  , "[" )
+PUNCTUATOR(R_SQUARE  , "]" )
+PUNCTUATOR(L_PAREN   , "(" )
+PUNCTUATOR(R_PAREN   , ")" )
+PUNCTUATOR(L_BRACE   , "{" )
+PUNCTUATOR(R_BRACE   , "}" )
+PUNCTUATOR(PERIOD    , "." )
+PUNCTUATOR(COMMA     , "," )
+PUNCTUATOR(HASH      , "#" )
+PUNCTUATOR(BACKQUOTE , "`" )
+PUNCTUATOR(APOSTROPHE, "'" )
+PUNCTUATOR(L_PAREN_STAR, "(*")
+PUNCTUATOR(STAR_R_PAREN, "*)")
+PUNCTUATOR(APOSTROPHE_L_BRACE, "'{")
 
 #undef KEYWORD
 #undef OPERATOR

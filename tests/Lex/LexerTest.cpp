@@ -62,7 +62,111 @@ protected:
 /*
  * 5. Lexical conventions
  * */
+using eTokns_t = std::vector<svlang::tok::TokenKind>;
+/*
+ * 5.5 Operators
+ * */
+#define TEST_PUNCTUATION(TEST_NAME, TOKEN_KIND, KIND_TEXT)                     \
+  TEST_F(LexerTest, Lex_Operators_Punctuation_##TEST_NAME) {                   \
+    eTokns_t eTokens;                                                          \
+    eTokens.push_back(TOKEN_KIND);                                             \
+    auto &test = KIND_TEXT;                                                    \
+    CheckLex(test, eTokens);                                                   \
+  }
 
+TEST_PUNCTUATION(Plus, svlang::tok::_PLUS, "+")
+TEST_PUNCTUATION(Plus_Plus, svlang::tok::_PLUS_PLUS, "++")
+TEST_PUNCTUATION(Plus_Equal, svlang::tok::_PLUS_EQUAL, "+=")
+TEST_PUNCTUATION(Plus_Colon, svlang::tok::_PLUS_COLON, "+:")
+
+TEST_PUNCTUATION(Equal, svlang::tok::_EQUAL, "=")
+TEST_PUNCTUATION(Equal_Equal, svlang::tok::_EQUAL_EQUAL, "==")
+TEST_PUNCTUATION(Equal_Equal_Equal, svlang::tok::_EQUAL_EQUAL_EQUAL, "===")
+TEST_PUNCTUATION(Equal_Equal_Question, svlang::tok::_EQUAL_EQUAL_QUESTION,
+                 "==?")
+
+TEST_PUNCTUATION(Minus, svlang::tok::_MINUS, "-");
+TEST_PUNCTUATION(Minus_Minus, svlang::tok::_MINUS_MINUS, "--");
+TEST_PUNCTUATION(Minus_Equal, svlang::tok::_MINUS_EQUAL, "-=");
+TEST_PUNCTUATION(Minus_Colon, svlang::tok::_MINUS_COLON, "-:");
+TEST_PUNCTUATION(Minus_Minus_Greater, svlang::tok::_MINUS_GREATER_GREATER,
+                 "->>");
+TEST_PUNCTUATION(Minus_Arrow, svlang::tok::_ARROW, "->");
+
+TEST_PUNCTUATION(Star, svlang::tok::_STAR, "*");
+TEST_PUNCTUATION(Star_Star, svlang::tok::_STAR_STAR, "**");
+TEST_PUNCTUATION(Star_Equal, svlang::tok::_STAR_EQUAL, "*=");
+TEST_PUNCTUATION(Star_Greater, svlang::tok::_STAR_GREATER, "*>");
+TEST_PUNCTUATION(Star_R_PAREN, svlang::tok::_STAR_R_PAREN, "*)");
+
+TEST_PUNCTUATION(Slash, svlang::tok::_SLASH, "/");
+TEST_PUNCTUATION(Slash_Equal, svlang::tok::_SLASH_EQUAL, "/=");
+
+TEST_PUNCTUATION(Percent, svlang::tok::_PERCENT, "%");
+TEST_PUNCTUATION(Percent_Equal, svlang::tok::_PERCENT_EQUAL, "%=");
+
+TEST_PUNCTUATION(Amp, svlang::tok::_AMP, "&");
+TEST_PUNCTUATION(Amp_Amp, svlang::tok::_AMP_AMP, "&&");
+TEST_PUNCTUATION(Amp_Amp_Amp, svlang::tok::_AMP_AMP_AMP, "&&&");
+TEST_PUNCTUATION(Amp_Equal, svlang::tok::_AMP_EQUAL, "&=");
+
+TEST_PUNCTUATION(Pipe, svlang::tok::_PIPE, "|");
+TEST_PUNCTUATION(Pipe_Pipe, svlang::tok::_PIPE_PIPE, "||");
+TEST_PUNCTUATION(Pipe_Minus_Greater, svlang::tok::_PIPE_MINUS_GREATER, "|->");
+TEST_PUNCTUATION(Pipe_Equal_greater, svlang::tok::_PIPE_EQUAL_GREATER, "|=>");
+TEST_PUNCTUATION(Pipe_Equal, svlang::tok::_PIPE_EQUAL, "|=");
+
+TEST_PUNCTUATION(Caret, svlang::tok::_CARET, "^");
+TEST_PUNCTUATION(Caret_Tilde, svlang::tok::_CARET_TILDE, "^~");
+TEST_PUNCTUATION(Caret_Equal, svlang::tok::_CARET_EQUAL, "^=");
+
+TEST_PUNCTUATION(Less, svlang::tok::_LESS, "<");
+TEST_PUNCTUATION(Less_Equal, svlang::tok::_LESS_EQUAL, "<=");
+TEST_PUNCTUATION(Less_Minus_Greater, svlang::tok::_LESS_MINUS_GREATER, "<->");
+TEST_PUNCTUATION(Less_Less, svlang::tok::_LESS_LESS, "<<");
+TEST_PUNCTUATION(Less_Less_Less, svlang::tok::_LESS_LESS_LESS, "<<<");
+TEST_PUNCTUATION(Less_Less_Less_Equal, svlang::tok::_LESS_LESS_LESS_EQUAL,
+                 "<<<=");
+TEST_PUNCTUATION(Less_Less_Equal, svlang::tok::_LESS_LESS_EQUAL, "<<=");
+
+TEST_PUNCTUATION(Greater, svlang::tok::_GREATER, ">");
+TEST_PUNCTUATION(Greater_Equal, svlang::tok::_GREATER_EQUAL, ">=");
+TEST_PUNCTUATION(Greater_Greater, svlang::tok::_GREATER_GREATER, ">>");
+TEST_PUNCTUATION(Greater_Greater_Greater, svlang::tok::_GREATER_GREATER_GREATER,
+                 ">>>");
+TEST_PUNCTUATION(Greater_Greater_Equal, svlang::tok::_GREATER_GREATER_EQUAL,
+                 ">>=");
+TEST_PUNCTUATION(Greater_Greater_Greater_Equal,
+                 svlang::tok::_GREATER_GREATER_GREATER_EQUAL, ">>>=");
+
+TEST_PUNCTUATION(Question, svlang::tok::_QUESTION, "?");
+
+TEST_PUNCTUATION(Tilde, svlang::tok::_TILDE, "~");
+TEST_PUNCTUATION(Tilde_Amp, svlang::tok::_TILDE_AMP, "~&");
+TEST_PUNCTUATION(Tilde_Pipe, svlang::tok::_TILDE_PIPE, "~|");
+TEST_PUNCTUATION(Tilde_Caret, svlang::tok::_TILDE_CARET, "~^");
+
+TEST_PUNCTUATION(Exclaim, svlang::tok::_EXCLAIM, "!");
+TEST_PUNCTUATION(Exclaim_Equal, svlang::tok::_EXCLAIM_EQUAL, "!=");
+TEST_PUNCTUATION(Exclaim_Equal_Equal, svlang::tok::_EXCLAIM_EQUAL_EQUAL, "!==");
+TEST_PUNCTUATION(Exclaim_Equal_Question, svlang::tok::_EXCLAIM_EQUAL_QUESTION,
+                 "!=?");
+
+TEST_PUNCTUATION(Colon, svlang::tok::_COLON, ":");
+TEST_PUNCTUATION(Colon_Equal, svlang::tok::_COLON_EQUAL, ":=");
+TEST_PUNCTUATION(Colon_Slash, svlang::tok::_COLON_SLASH, ":/");
+TEST_PUNCTUATION(Colon_Colon, svlang::tok::_COLON_COLON, "::");
+
+TEST_PUNCTUATION(Apostrophe_L_Brace, svlang::tok::_APOSTROPHE_L_BRACE, "'{");
+
+TEST_PUNCTUATION(L_Paren, svlang::tok::_L_PAREN, "(");
+TEST_PUNCTUATION(L_Paren_Star, svlang::tok::_L_PAREN_STAR, "(*");
+
+TEST_PUNCTUATION(R_Paren, svlang::tok::_R_PAREN, ")");
+
+TEST_PUNCTUATION(L_Brace, svlang::tok::_L_BRACE, "{");
+
+TEST_PUNCTUATION(R_Brace, svlang::tok::_R_BRACE, "}");
 /*
  * 5.4 Comments
  * */
