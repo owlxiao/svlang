@@ -901,6 +901,11 @@ LexNextToken:
     }
     break;
 
+    // ;
+  case ';':
+    Kind = tok::_SEMI;
+    break;
+
   default:
     if (clang::isASCII(Char)) {
       Kind = tok::_UNKNOWN;
