@@ -172,6 +172,11 @@ TEST_PUNCTUATION(At, svlang::tok::_AT, "@");
 TEST_PUNCTUATION(At_At, svlang::tok::_AT_AT, "@@");
 
 TEST_PUNCTUATION(Semi, svlang::tok::_SEMI, ";");
+
+TEST_PUNCTUATION(Hash, svlang::tok::_HASH, "#");
+TEST_PUNCTUATION(Hash_Hash, svlang::tok::_HASH_HASH, "##");
+TEST_PUNCTUATION(Hash_Minus_Hash, svlang::tok::_HASH_MINUS_HASH, "#-#");
+TEST_PUNCTUATION(Hash_Equal_Hash, svlang::tok::_HASH_EQUAL_HASH, "#=#");
 /*
  * 5.4 Comments
  * */

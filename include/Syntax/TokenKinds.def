@@ -181,6 +181,13 @@ OPERATOR(COLON_SLASH, ":/")
 // 8.23 Class scope resolution operator ::
 OPERATOR(COLON_COLON, "::")
 
+// 14.11 Cycle delay: ##
+OPERATOR(HASH_HASH, "##")
+
+// 16.12 Declaring properties
+OPERATOR(HASH_MINUS_HASH, "#-#")
+OPERATOR(HASH_EQUAL_HASH, "#=#")
+
 // Others non-operator
 PUNCTUATOR(L_SQUARE  , "[" )
 PUNCTUATOR(R_SQUARE  , "]" )

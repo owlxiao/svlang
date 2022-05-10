@@ -906,6 +906,44 @@ LexNextToken:
     Kind = tok::_SEMI;
     break;
 
+    // #
+    // ##
+    // #-#
+    // #=#
+  case '#':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    switch (Char) {
+    case '#':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_HASH_HASH;
+      break;
+
+    case '-':
+      (void)getAndAdcanceChar(CurPtr);
+      if (getCharAndSize(CurPtr, SizeTmp) == '#') {
+        CurPtr = ConsumeChar(CurPtr, SizeTmp);
+        Kind = tok::_HASH_MINUS_HASH;
+      } else {
+        Kind = tok::_UNKNOWN;
+      }
+      break;
+
+    case '=':
+      (void)getAndAdcanceChar(CurPtr);
+      if (getCharAndSize(CurPtr, SizeTmp) == '#') {
+        CurPtr = ConsumeChar(CurPtr, SizeTmp);
+        Kind = tok::_HASH_EQUAL_HASH;
+      } else {
+        Kind = tok::_UNKNOWN;
+      }
+      break;
+
+    default:
+      Kind = tok::_HASH;
+      break;
+    }
+    break;
+
   default:
     if (clang::isASCII(Char)) {
       Kind = tok::_UNKNOWN;
