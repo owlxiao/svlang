@@ -209,6 +209,24 @@ bool Lexer::lexStringLiteral(Token &Result, const char *CurPtr) {
   return true;
 }
 
+bool Lexer::lexIdentifier(Token &Result, const char *CurPtr) {
+  while (true) {
+    unsigned Size;
+    unsigned char Char = getCharAndSize(CurPtr, Size);
+
+    if (isIdentifier(Char)) {
+      CurPtr = ConsumeChar(CurPtr, Size);
+      continue;
+    }
+    break;
+  }
+
+  const char *TokStart = BufferPtr;
+  FormToken(Result, CurPtr, tok::_IDENTIFIER);
+  Result.setLiteralData(TokStart);
+  return true;
+}
+
 bool Lexer::lexBaseFormat(Token &Result, const char *CurPtr) {
   char C = getAndAdcanceChar(CurPtr);
   tok::TokenKind kind;
@@ -437,6 +455,7 @@ LexNextToken:
         return lexNumericLiteral(Result, CurPtr);
       }
     }
+    return lexIdentifier(Result, CurPtr);
 
     // =
     // ==

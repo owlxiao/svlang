@@ -197,6 +197,31 @@ multiple lines
 */)";
   CheckLex(text, ExpectedNullTokens);
 }
+
+/*
+ * 5.6 Identifiers, keywords, and system names
+ * */
+
+// example
+TEST_F(LexerTest, Lexer_Identifiers_Identifiers) {
+  std::vector<svlang::tok::TokenKind> eTokens;
+  eTokens.push_back(svlang::tok::_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_IDENTIFIER);
+
+  auto &test = "shiftreg_a\n"
+               "busa_index\n"
+               "error_condition\n"
+               "merge_ab\n"
+               "_bus3\n"
+               "n$657\n";
+
+  CheckLex(test, eTokens);
+}
+
 using expectedToken = llvm::ArrayRef<svlang::tok::TokenKind>;
 /*
  * 5.7 Numbers

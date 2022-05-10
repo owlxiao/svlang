@@ -92,5 +92,9 @@ LLVM_READONLY inline uint8_t getHexDigitValue(const unsigned char c) {
   return static_cast<uint8_t>(10 + c -'a');
 }
 
+LLVM_READONLY inline bool isIdentifier(unsigned char c) {
+  return clang::isIdentifierBody(c, true);
+}
+
 }
 #endif // SVLANG_BASIC_CHARINFO

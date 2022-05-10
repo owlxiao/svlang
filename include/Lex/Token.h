@@ -34,6 +34,10 @@ public:
     return reinterpret_cast<const char *>(PtrData);
   }
 
+  llvm::StringRef getIdentifier() const {
+    return llvm::StringRef(reinterpret_cast<const char*>(PtrData), getLength());
+  }
+
   llvm::SMLoc getLocation() const {
     return llvm::SMLoc::getFromPointer(Location);
   }
