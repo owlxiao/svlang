@@ -210,11 +210,12 @@ bool Lexer::lexStringLiteral(Token &Result, const char *CurPtr) {
 }
 
 bool Lexer::lexIdentifier(Token &Result, const char *CurPtr,
-                          const bool isSimple) {
+                          const tok::TokenKind Kind) {
   unsigned Size;
   unsigned char Char;
+  const bool isSimple = (Kind == tok::_ESCAPED_IDENTIFIER);
 
-  if (!isSimple) {
+  if (isSimple) {
     (void)getAndAdcanceChar(CurPtr);
   }
 
@@ -226,7 +227,7 @@ bool Lexer::lexIdentifier(Token &Result, const char *CurPtr,
       continue;
     }
 
-    if (!isSimple && clang::isPrintable(Char)) {
+    if (isSimple && clang::isPrintable(Char)) {
       CurPtr = ConsumeChar(CurPtr, Size);
       if (clang::isWhitespace(Char)) {
         break;
@@ -237,7 +238,7 @@ bool Lexer::lexIdentifier(Token &Result, const char *CurPtr,
   }
 
   const char *TokStart = BufferPtr;
-  FormToken(Result, CurPtr, tok::_IDENTIFIER);
+  FormToken(Result, CurPtr, Kind);
   Result.setLiteralData(TokStart);
   return true;
 }
@@ -470,10 +471,10 @@ LexNextToken:
         return lexNumericLiteral(Result, CurPtr);
       }
     }
-    return lexIdentifier(Result, CurPtr, true);
+    return lexIdentifier(Result, CurPtr, tok::_IDENTIFIER);
 
   case '\\':
-    return lexIdentifier(Result, CurPtr, false);
+    return lexIdentifier(Result, CurPtr, tok::_ESCAPED_IDENTIFIER);
 
     // =
     // ==
@@ -882,6 +883,11 @@ LexNextToken:
       break;
     }
     break;
+
+    // $
+  case '$':
+    (void)getAndAdcanceChar(CurPtr);
+    return lexIdentifier(Result, CurPtr, tok::_SYSTEM_TF_IDENTIFIER);
 
   default:
     if (clang::isASCII(Char)) {

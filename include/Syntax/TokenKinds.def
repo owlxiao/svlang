@@ -21,7 +21,12 @@ TOK(EOF)     // End of file
 // — Integer, real, string, array, structure, and time literals
 // — Built-in method calls
 // — Attributes
+
+// 5.6 Identifiers, keywords, and system names
 TOK(IDENTIFIER)
+
+// 5.6.1 Escaped identifiers
+TOK(ESCAPED_IDENTIFIER)
 
 // 5.6.3 System tasks and system functions
 TOK(SYSTEM_TF_IDENTIFIER)

@@ -225,12 +225,12 @@ TEST_F(LexerTest, Lexer_Identifiers_Identifiers) {
 // 5.6.1 Escaped identifiers
 TEST_F(LexerTest, Lexer_Identifiers_Escaped_Identifiers) {
   std::vector<svlang::tok::TokenKind> eTokens;
-  eTokens.push_back(svlang::tok::_IDENTIFIER);
-  eTokens.push_back(svlang::tok::_IDENTIFIER);
-  eTokens.push_back(svlang::tok::_IDENTIFIER);
-  eTokens.push_back(svlang::tok::_IDENTIFIER);
-  eTokens.push_back(svlang::tok::_IDENTIFIER);
-  eTokens.push_back(svlang::tok::_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_ESCAPED_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_ESCAPED_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_ESCAPED_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_ESCAPED_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_ESCAPED_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_ESCAPED_IDENTIFIER);
 
   auto &test = R"(\busa+index
 \-clock
@@ -239,6 +239,18 @@ TEST_F(LexerTest, Lexer_Identifiers_Escaped_Identifiers) {
 \{a,b}
 \a*(b+c)
 )";
+
+  CheckLex(test, eTokens);
+}
+
+// 5.6.3 System tasks and system functions
+TEST_F(LexerTest, Lexer_Identifiers_System_tf_identifier) {
+  std::vector<svlang::tok::TokenKind> eTokens;
+  eTokens.push_back(svlang::tok::_SYSTEM_TF_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_SYSTEM_TF_IDENTIFIER);
+
+  auto &test = "$display\n"
+               "$finish";
 
   CheckLex(test, eTokens);
 }

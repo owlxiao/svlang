@@ -39,7 +39,7 @@ public:
   bool lexNumericLiteral(Token &Result, const char *CurPtr);
   bool lexBaseFormat(Token &Result, const char *CurPtr);
   bool lexStringLiteral(Token &Result, const char *CurPtr);
-  bool lexIdentifier(Token &Result, const char *CurPtf, const bool isSimple);
+  bool lexIdentifier(Token &Result, const char *CurPtf, const tok::TokenKind Kind);
 
   bool isTimeUnit(const char *C) const;
 
