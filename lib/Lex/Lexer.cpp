@@ -889,6 +889,18 @@ LexNextToken:
     (void)getAndAdcanceChar(CurPtr);
     return lexIdentifier(Result, CurPtr, tok::_SYSTEM_TF_IDENTIFIER);
 
+    // @
+    // @@
+  case '@':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    if (Char == '@') {
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_AT_AT;
+    } else {
+      Kind = tok::_AT;
+    }
+    break;
+
   default:
     if (clang::isASCII(Char)) {
       Kind = tok::_UNKNOWN;

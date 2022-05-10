@@ -167,6 +167,9 @@ TEST_PUNCTUATION(R_Paren, svlang::tok::_R_PAREN, ")");
 TEST_PUNCTUATION(L_Brace, svlang::tok::_L_BRACE, "{");
 
 TEST_PUNCTUATION(R_Brace, svlang::tok::_R_BRACE, "}");
+
+TEST_PUNCTUATION(At, svlang::tok::_AT, "@");
+TEST_PUNCTUATION(At_At, svlang::tok::_AT_AT, "@@");
 /*
  * 5.4 Comments
  * */
