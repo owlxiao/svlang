@@ -222,6 +222,27 @@ TEST_F(LexerTest, Lexer_Identifiers_Identifiers) {
   CheckLex(test, eTokens);
 }
 
+// 5.6.1 Escaped identifiers
+TEST_F(LexerTest, Lexer_Identifiers_Escaped_Identifiers) {
+  std::vector<svlang::tok::TokenKind> eTokens;
+  eTokens.push_back(svlang::tok::_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_IDENTIFIER);
+  eTokens.push_back(svlang::tok::_IDENTIFIER);
+
+  auto &test = R"(\busa+index
+\-clock
+\***error-condition***
+\net1/\net2
+\{a,b}
+\a*(b+c)
+)";
+
+  CheckLex(test, eTokens);
+}
+
 using expectedToken = llvm::ArrayRef<svlang::tok::TokenKind>;
 /*
  * 5.7 Numbers

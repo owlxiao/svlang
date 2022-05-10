@@ -209,13 +209,28 @@ bool Lexer::lexStringLiteral(Token &Result, const char *CurPtr) {
   return true;
 }
 
-bool Lexer::lexIdentifier(Token &Result, const char *CurPtr) {
+bool Lexer::lexIdentifier(Token &Result, const char *CurPtr,
+                          const bool isSimple) {
+  unsigned Size;
+  unsigned char Char;
+
+  if (!isSimple) {
+    (void)getAndAdcanceChar(CurPtr);
+  }
+
   while (true) {
-    unsigned Size;
-    unsigned char Char = getCharAndSize(CurPtr, Size);
+    Char = getCharAndSize(CurPtr, Size);
 
     if (isIdentifier(Char)) {
       CurPtr = ConsumeChar(CurPtr, Size);
+      continue;
+    }
+
+    if (!isSimple && clang::isPrintable(Char)) {
+      CurPtr = ConsumeChar(CurPtr, Size);
+      if (clang::isWhitespace(Char)) {
+        break;
+      }
       continue;
     }
     break;
@@ -455,7 +470,10 @@ LexNextToken:
         return lexNumericLiteral(Result, CurPtr);
       }
     }
-    return lexIdentifier(Result, CurPtr);
+    return lexIdentifier(Result, CurPtr, true);
+
+  case '\\':
+    return lexIdentifier(Result, CurPtr, false);
 
     // =
     // ==
