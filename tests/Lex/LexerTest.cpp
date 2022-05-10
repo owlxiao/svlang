@@ -182,6 +182,9 @@ TEST_PUNCTUATION(L_Square, svlang::tok::_L_SQUARE, "[");
 
 TEST_PUNCTUATION(R_Square, svlang::tok::_R_SQUARE, "]");
 
+TEST_PUNCTUATION(Period, svlang::tok::_PERIOD, ".");
+TEST_PUNCTUATION(Period_Star, svlang::tok::_PERIOD_STAR, ".*");
+
 /*
  * 5.4 Comments
  * */

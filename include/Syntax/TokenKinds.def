@@ -207,6 +207,9 @@ PUNCTUATOR(AT   , "@")
 PUNCTUATOR(AT_AT, "@@")
 PUNCTUATOR(SEMI, ";")
 
+// 23.3.2.4 Connecting module instances using wildcard named port connections
+PUNCTUATOR(PERIOD_STAR, ".*")
+
 #undef KEYWORD
 #undef OPERATOR
 #undef PUNCTUATOR

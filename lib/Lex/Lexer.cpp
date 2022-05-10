@@ -954,6 +954,18 @@ LexNextToken:
     Kind = tok::_R_SQUARE;
     break;
 
+    // .
+    // .*
+  case '.':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    if (Char == '*') {
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_PERIOD_STAR;
+    } else {
+      Kind = tok::_PERIOD;
+    }
+    break;
+
   default:
     if (clang::isASCII(Char)) {
       Kind = tok::_UNKNOWN;
