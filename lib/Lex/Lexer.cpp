@@ -967,6 +967,11 @@ LexNextToken:
     }
     break;
 
+    // ,
+  case ',':
+    Kind = tok::_COMMA;
+    break;
+
   default:
     if (clang::isASCII(Char)) {
       Kind = tok::_UNKNOWN;
