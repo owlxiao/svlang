@@ -177,6 +177,11 @@ TEST_PUNCTUATION(Hash, svlang::tok::_HASH, "#");
 TEST_PUNCTUATION(Hash_Hash, svlang::tok::_HASH_HASH, "##");
 TEST_PUNCTUATION(Hash_Minus_Hash, svlang::tok::_HASH_MINUS_HASH, "#-#");
 TEST_PUNCTUATION(Hash_Equal_Hash, svlang::tok::_HASH_EQUAL_HASH, "#=#");
+
+TEST_PUNCTUATION(L_Square, svlang::tok::_L_SQUARE, "[");
+
+TEST_PUNCTUATION(R_Square, svlang::tok::_R_SQUARE, "]");
+
 /*
  * 5.4 Comments
  * */

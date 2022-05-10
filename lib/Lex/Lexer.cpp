@@ -944,6 +944,16 @@ LexNextToken:
     }
     break;
 
+    // [
+  case '[':
+    Kind = tok::_L_SQUARE;
+    break;
+
+    // ]
+  case ']':
+    Kind = tok::_R_SQUARE;
+    break;
+
   default:
     if (clang::isASCII(Char)) {
       Kind = tok::_UNKNOWN;
