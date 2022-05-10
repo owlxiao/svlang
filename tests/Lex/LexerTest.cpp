@@ -185,6 +185,8 @@ TEST_PUNCTUATION(R_Square, svlang::tok::_R_SQUARE, "]");
 TEST_PUNCTUATION(Period, svlang::tok::_PERIOD, ".");
 TEST_PUNCTUATION(Period_Star, svlang::tok::_PERIOD_STAR, ".*");
 
+TEST_PUNCTUATION(Dollar, svlang::tok::_DOLLAR, "$");
+
 /*
  * 5.4 Comments
  * */

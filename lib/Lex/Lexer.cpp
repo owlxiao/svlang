@@ -237,8 +237,10 @@ bool Lexer::lexIdentifier(Token &Result, const char *CurPtr,
     break;
   }
 
+  bool isSingleDollar = (CurPtr - BufferPtr) == 1;
+
   const char *TokStart = BufferPtr;
-  FormToken(Result, CurPtr, Kind);
+  FormToken(Result, CurPtr, isSingleDollar ? tok::_DOLLAR : Kind);
   Result.setLiteralData(TokStart);
   return true;
 }
@@ -886,7 +888,6 @@ LexNextToken:
 
     // $
   case '$':
-    (void)getAndAdcanceChar(CurPtr);
     return lexIdentifier(Result, CurPtr, tok::_SYSTEM_TF_IDENTIFIER);
 
     // @

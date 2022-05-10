@@ -210,6 +210,8 @@ PUNCTUATOR(SEMI, ";")
 // 23.3.2.4 Connecting module instances using wildcard named port connections
 PUNCTUATOR(PERIOD_STAR, ".*")
 
+PUNCTUATOR(DOLLAR, "$")
+
 #undef KEYWORD
 #undef OPERATOR
 #undef PUNCTUATOR
