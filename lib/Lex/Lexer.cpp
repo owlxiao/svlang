@@ -237,7 +237,8 @@ bool Lexer::lexIdentifier(Token &Result, const char *CurPtr,
     break;
   }
 
-  bool isSingleDollar = (CurPtr - BufferPtr) == 1;
+  bool isSingleDollar =
+      ((CurPtr - BufferPtr) == 1) && (Kind == tok::_SYSTEM_TF_IDENTIFIER);
 
   const char *TokStart = BufferPtr;
   FormToken(Result, CurPtr, isSingleDollar ? tok::_DOLLAR : Kind);
