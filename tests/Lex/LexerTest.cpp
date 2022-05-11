@@ -189,6 +189,13 @@ TEST_PUNCTUATION(Dollar, svlang::tok::_DOLLAR, "$");
 
 TEST_PUNCTUATION(Comma, svlang::tok::_COMMA, ",");
 
+TEST_PUNCTUATION(Grave_Accent, svlang::tok::_GRAVE_ACCENT, "`");
+TEST_PUNCTUATION(Grave_Accent_Grave_Accent,
+                 svlang::tok::_GRAVE_ACCENT_GRAVE_ACCENT, "``");
+TEST_PUNCTUATION(Grave_Accent_Quote, svlang::tok::_GRAVE_ACCENT_QUOTE, "`\"");
+TEST_PUNCTUATION(Grave_Accent_Backslash_Grave_Accent_Quote,
+                 svlang::tok::_GRAVE_ACCENT_BACKSLASH_GRAVE_ACCENT_QUOTE,
+                 "`\\`\"");
 /*
  * 5.4 Comments
  * */

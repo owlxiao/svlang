@@ -212,6 +212,12 @@ PUNCTUATOR(PERIOD_STAR, ".*")
 
 PUNCTUATOR(DOLLAR, "$")
 
+// 5.6.4 Compiler directives
+PUNCTUATOR(GRAVE_ACCENT                             , "`"    )
+PUNCTUATOR(GRAVE_ACCENT_QUOTE                       , "`\""  )
+PUNCTUATOR(GRAVE_ACCENT_GRAVE_ACCENT                , "``"   )
+PUNCTUATOR(GRAVE_ACCENT_BACKSLASH_GRAVE_ACCENT_QUOTE, "`\`\"")
+
 #undef KEYWORD
 #undef OPERATOR
 #undef PUNCTUATOR

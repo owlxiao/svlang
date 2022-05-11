@@ -972,6 +972,37 @@ LexNextToken:
     Kind = tok::_COMMA;
     break;
 
+    // `
+    // '"
+    // ``
+    // `\`"
+  case '`':
+    Char = getCharAndSize(CurPtr, SizeTmp);
+    switch (Char) {
+    case '`':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_GRAVE_ACCENT_GRAVE_ACCENT;
+      break;
+    case '"':
+      CurPtr = ConsumeChar(CurPtr, SizeTmp);
+      Kind = tok::_GRAVE_ACCENT_QUOTE;
+      break;
+    case '\\':
+      (void)getAndAdcanceChar(CurPtr);
+      if (getCharAndSize(CurPtr, SizeTmp) == '`') {
+        (void)getAndAdcanceChar(CurPtr);
+        if (getCharAndSize(CurPtr, SizeTmp) == '"') {
+          CurPtr = ConsumeChar(CurPtr, SizeTmp);
+          Kind = tok::_GRAVE_ACCENT_BACKSLASH_GRAVE_ACCENT_QUOTE;
+          break;
+        }
+      }
+    default:
+      Kind = tok::_GRAVE_ACCENT;
+      break;
+    }
+    break;
+
   default:
     if (clang::isASCII(Char)) {
       Kind = tok::_UNKNOWN;
