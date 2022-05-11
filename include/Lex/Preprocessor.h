@@ -10,6 +10,8 @@
 
 namespace svlang {
 
+class Lexer;
+
 class Preprocessor {
 public:
   Preprocessor(llvm::SourceMgr &SM);
@@ -21,6 +23,8 @@ public:
   void Lex(Token &Token);
 
   void enterMainSourceFile();
+
+  bool handleCompilerDirective(Token &Result);
 
   // Print the Token to stderr
 public:

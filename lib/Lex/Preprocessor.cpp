@@ -1,6 +1,8 @@
-#include "Lex/Preprocessor.h"
+#include <memory>
+
 #include "Basic/TokenKinds.h"
 #include "Lex/Lexer.h"
+#include "Lex/Preprocessor.h"
 
 namespace svlang {
 
@@ -15,7 +17,7 @@ void Preprocessor::Lex(Token &Result) {
 }
 
 void Preprocessor::enterMainSourceFile() {
-  CurLexer.reset(new Lexer(SourceMgr));
+  CurLexer.reset(new Lexer(SourceMgr, *this));
 }
 
 void Preprocessor::DumpToken(const Token &Tok) const {

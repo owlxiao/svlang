@@ -1,5 +1,5 @@
 #ifndef TOK
-#define TOK(X) _##X
+#define TOK(X)
 #endif
 #ifndef PUNCTUATOR
 #define PUNCTUATOR(X, Y) TOK(X)
@@ -11,7 +11,7 @@
 #define KEYWORD(X, Y) TOK(_KW_ ## X)
 #endif
 #ifndef COMPILER_DIRECTIVE
-#define COMPILER_DIRECTIVE(X) _CP_## X
+#define COMPILER_DIRECTIVE(X)
 #endif
 
 TOK(UNKNOWN) // Not a token

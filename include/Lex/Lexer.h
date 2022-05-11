@@ -4,12 +4,15 @@
 #include <llvm/Support/SourceMgr.h>
 
 #include "Lex/Token.h"
+#include "Lex/Preprocessor.h"
 
 namespace svlang {
 
+class Preprocessor;
+
 class Lexer {
 public:
-  Lexer(llvm::SourceMgr &SM);
+  Lexer(llvm::SourceMgr &SM, Preprocessor &PP);
 
 public:
   bool Lex(Token &Result);
@@ -40,6 +43,7 @@ public:
   bool lexBaseFormat(Token &Result, const char *CurPtr);
   bool lexStringLiteral(Token &Result, const char *CurPtr);
   bool lexIdentifier(Token &Result, const char *CurPtf, const tok::TokenKind Kind);
+  bool lexCompilerDirective(Token &Result, const char *CurPtr);
 
   bool isTimeUnit(const char *C) const;
 
@@ -53,6 +57,8 @@ private:
   const char *BufferPtr;
 
   Token lastToken;
+
+  Preprocessor* PP;
 };
 
 } // namespace svlang

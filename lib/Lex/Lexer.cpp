@@ -11,12 +11,13 @@
 
 namespace svlang {
 
-Lexer::Lexer(llvm::SourceMgr &SM) {
+Lexer::Lexer(llvm::SourceMgr &SM, Preprocessor &PP) {
   unsigned int MainFileID = SM.getMainFileID();
   BufferStart = SM.getMemoryBuffer(MainFileID)->getBufferStart();
   BufferPtr = SM.getMemoryBuffer(MainFileID)->getBufferStart();
   BufferEnd = SM.getMemoryBuffer(MainFileID)->getBufferEnd();
   lastToken.startToken();
+  this->PP = &PP;
 }
 
 //
@@ -244,6 +245,12 @@ bool Lexer::lexIdentifier(Token &Result, const char *CurPtr,
   FormToken(Result, CurPtr, isSingleDollar ? tok::_DOLLAR : Kind);
   Result.setLiteralData(TokStart);
   return true;
+}
+
+bool Lexer::lexCompilerDirective(Token &Result, const char *CurPtr) {
+  // Save the token
+  FormToken(Result, CurPtr, tok::_GRAVE_ACCENT);
+  return PP->handleCompilerDirective(Result);
 }
 
 bool Lexer::lexBaseFormat(Token &Result, const char *CurPtr) {
@@ -999,8 +1006,7 @@ LexNextToken:
         }
       }
     default:
-      Kind = tok::_GRAVE_ACCENT;
-      break;
+      return lexCompilerDirective(Result, CurPtr);
     }
     break;
 
