@@ -10,6 +10,9 @@
 #ifndef KEYWORD
 #define KEYWORD(X, Y) TOK(_KW_ ## X)
 #endif
+#ifndef COMPILER_DIRECTIVE
+#define COMPILER_DIRECTIVE(X) _CP_## X
+#endif
 
 TOK(UNKNOWN) // Not a token
 TOK(EOF)     // End of file
@@ -218,6 +221,30 @@ PUNCTUATOR(GRAVE_ACCENT_QUOTE                       , "`\""  )
 PUNCTUATOR(GRAVE_ACCENT_GRAVE_ACCENT                , "``"   )
 PUNCTUATOR(GRAVE_ACCENT_BACKSLASH_GRAVE_ACCENT_QUOTE, "`\`\"")
 
+COMPILER_DIRECTIVE(__FILE__           )
+COMPILER_DIRECTIVE(__LINE__           )
+COMPILER_DIRECTIVE(begin_keywords     )
+COMPILER_DIRECTIVE(celldefine         )
+COMPILER_DIRECTIVE(default_nettype    )
+COMPILER_DIRECTIVE(define             )
+COMPILER_DIRECTIVE(else               )
+COMPILER_DIRECTIVE(elsif              )
+COMPILER_DIRECTIVE(end_keywords       )
+COMPILER_DIRECTIVE(endcelldefine      )
+COMPILER_DIRECTIVE(endif              )
+COMPILER_DIRECTIVE(ifdef              )
+COMPILER_DIRECTIVE(ifndef             )
+COMPILER_DIRECTIVE(include            )
+COMPILER_DIRECTIVE(line               )
+COMPILER_DIRECTIVE(nounconnected_drive)
+COMPILER_DIRECTIVE(pragma             )
+COMPILER_DIRECTIVE(resetall           )
+COMPILER_DIRECTIVE(timescale          )
+COMPILER_DIRECTIVE(unconnected_drive  )
+COMPILER_DIRECTIVE(undef              )
+COMPILER_DIRECTIVE(undefineall        )
+
+#undef COMPILER_DIRECTIVE
 #undef KEYWORD
 #undef OPERATOR
 #undef PUNCTUATOR

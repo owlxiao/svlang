@@ -13,6 +13,14 @@ enum TokenKind : unsigned int {
   _NUM_TOKENS
 };
 
+// 22. Compiler directives
+// such: _CP_DEFINE
+enum CPKeywordKind {
+#define COMPILER_DIRECTIVE(X) _CP_##X,
+#include "Syntax/TokenKinds.def"
+  NUM_CP_KEYWORDS
+};
+
 const char *getTokenName(TokenKind Kind) LLVM_READNONE;
 
 } // namespace tok
