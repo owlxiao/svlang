@@ -8,6 +8,8 @@
 
 #include "Basic/CharInfo.h"
 #include "Lex/Lexer.h"
+#include "Syntax/SyntaxIdentifierInfo.h"
+#include "Syntax/SyntaxIdentifierTable.h"
 
 namespace svlang {
 
@@ -244,6 +246,11 @@ bool Lexer::lexIdentifier(Token &Result, const char *CurPtr,
   const char *TokStart = BufferPtr;
   FormToken(Result, CurPtr, isSingleDollar ? tok::_DOLLAR : Kind);
   Result.setLiteralData(TokStart);
+
+  Syntax::IdentifierInfo *II = getCompilerDirective(Result.getIdentifier());
+  if (II != nullptr) {
+    Result.setIdentifierInfo(II);
+  }
   return true;
 }
 
@@ -323,6 +330,12 @@ std::string Lexer::getSpelling(const Token &Tok) {
   char *spelling = &*Result.begin();
   const char *TokStart = Tok.getLocation().getPointer();
   const char *TokEnd = TokStart + Tok.getLength();
+  /*if (Tok.is(tok::_IDENTIFIER) || Tok.is(tok::_ESCAPED_IDENTIFIER) ||
+      Tok.is(tok::_SYSTEM_TF_IDENTIFIER)) {
+    const Syntax::IdentifierInfo *II = Tok.getIdentifierInfo();
+    TokStart = II->getString();
+  }*/
+
   char *bufPtr = const_cast<char *>(TokStart);
   while (bufPtr < TokEnd) {
     spelling[length++] = *bufPtr;

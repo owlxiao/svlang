@@ -5,6 +5,7 @@
 #include <llvm/Support/SMLoc.h>
 
 #include "Basic/TokenKinds.h"
+#include "Syntax/SyntaxIdentifierInfo.h"
 
 namespace svlang {
 
@@ -25,6 +26,10 @@ public:
 
   void setLocation(llvm::SMLoc Loc) { Location = Loc.getPointer(); }
 
+  void setIdentifierInfo(Syntax::IdentifierInfo *II) {
+    PtrData = (void*)II;
+  }
+
   tok::TokenKind getKind() const { return Kind; }
 
   bool is(tok::TokenKind K) const { return Kind == K; }
@@ -40,6 +45,10 @@ public:
 
   llvm::SMLoc getLocation() const {
     return llvm::SMLoc::getFromPointer(Location);
+  }
+
+  Syntax::IdentifierInfo* getIdentifierInfo() const {
+    return (Syntax::IdentifierInfo*)PtrData;
   }
 
   size_t getLength() const { return Length; }

@@ -7,4 +7,5 @@ add_svlang_library(svlangLex
 
     LINK_LIBS
     svlangBasic
+    svlangSyntax
 )
