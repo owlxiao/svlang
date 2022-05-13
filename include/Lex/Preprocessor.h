@@ -1,8 +1,10 @@
 #ifndef SVLANG_LEX_PREPROCESSOR_H
 #define SVLANG_LEX_PREPROCESSOR_H
 
+#include <llvm/Support/Allocator.h>
 #include <llvm/Support/SourceMgr.h>
 #include <llvm/Support/raw_ostream.h>
+
 #include <memory>
 
 #include "Lex/Lexer.h"
@@ -30,10 +32,14 @@ public:
 public:
   void DumpToken(const Token &Tok) const;
 
+  llvm::BumpPtrAllocator &getPreprocessorAllocator() { return BP; }
+
 private:
   llvm::SourceMgr &SourceMgr;
 
   std::unique_ptr<Lexer> CurLexer;
+
+  llvm::BumpPtrAllocator BP;
 };
 
 } // namespace svlang
