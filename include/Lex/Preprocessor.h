@@ -9,6 +9,7 @@
 
 #include "Lex/Lexer.h"
 #include "Lex/Token.h"
+#include "Syntax/MacroInfo.h"
 
 namespace svlang {
 
@@ -27,6 +28,15 @@ public:
   void enterMainSourceFile();
 
   bool handleCompilerDirective(Token &Result);
+
+public:
+  /// Handle `define directive
+  bool handleDefineDirective(Token &DefineTok);
+  // Helper functions
+  Syntax::MacroFormalArgument* parseFormalArgument(Token &Tok);
+  bool readMacroArgumentList(Syntax::MacroInfo *MI, Token &Tok);
+  Syntax::MacroInfo* readMacroArgumentListAndMacroText(const Token &MacroNameTok);
+  /// End
 
   // Print the Token to stderr
 public:
