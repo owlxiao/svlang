@@ -34,8 +34,19 @@ public:
     std::copy(List.begin(), List.end(), ArgumentList);
   }
 
+  /// Retuen true whether this is a function-like macro
+  bool isFunctionLike() const { return _IsFunctionLike; }
+  bool isObjectLike() const { return !_IsFunctionLike; }
+
+  /// Set this macro has list_of_formal_arguments
+  void setIsFunctionLike() { _IsFunctionLike = true; }
+
 private:
   MacroFormalArgument *ArgumentList = nullptr;
+
+  /// True if this macro is function like.
+  /// e.g. `define HELLO(X) is a function-like macro
+  bool _IsFunctionLike : 1;
 };
 } // namespace Syntax
 } // namespace svlang

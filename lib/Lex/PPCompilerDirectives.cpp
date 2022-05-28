@@ -44,6 +44,9 @@ Preprocessor::readMacroArgumentListAndMacroText(const Token &MacroNameTok) {
 
   // This macro has list_of_formal_arguments
   if (Tok.is(tok::_L_PAREN)) {
+    // this macro has list_of_formal_arguments
+    // Read macro argument list
+    MI->setIsFunctionLike();
     if (!readMacroArgumentList(MI, Tok))
       return nullptr;
   }
